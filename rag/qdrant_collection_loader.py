@@ -1,8 +1,10 @@
 from qdrant_client import QdrantClient
-from qdrant_client.models import Document, Distance, VectorParams, PointStruct
+from qdrant_client.models import Batch, Distance, VectorParams, PointStruct
 from utils.paths import *
 import polars as pl
 from tqdm import tqdm
+from fastembed import TextEmbedding
+from uuid6 import uuid7
 
 COLLECTION_NAME = "arXiv_abstracts"
 QDRANT_URL = "http://localhost:6333"
@@ -13,7 +15,8 @@ METADATA_PATH = DATA_PATH / "arxiv_metadata.parquet"
 
 class CollectionLoader:
     def __init__(self, collection_name=COLLECTION_NAME, metadata_path=METADATA_PATH):
-        self.client = QdrantClient(url=QDRANT_URL)
+        self.client = QdrantClient(url=QDRANT_URL, prefer_grpc=True)
+        self.model = TextEmbedding(model_name=MODEL_NAME)
         self.metadata = self._get_metadata(metadata_path)
         self.collection_name = collection_name
         self.create_collection()
@@ -32,28 +35,30 @@ class CollectionLoader:
 
     def fill_collection(self, batch_size=BATCH_SIZE):
         for batch in tqdm(self.metadata.iter_slices(n_rows=batch_size), desc="Batches processed"):
-            documents = [Document(text=text, model=MODEL_NAME) for text in batch["abstract"].to_list()]
+            texts = batch["abstract"].to_list()
             payloads = batch.select(["id", "title", "update_date"]).to_dicts()
+            embeddings = self.model.embed(texts)
+            ids = [uuid7().hex for _ in range(len(texts))]
 
-            self.client.upload_collection(
+            self.client.upsert(
                 collection_name=self.collection_name,
-                vectors=documents,
-                payload=payloads,
-                batch_size=batch_size
+                points=Batch(
+                    ids=ids,
+                    vectors=embeddings,
+                    payloads=payloads
+                )
             )
 
     def get_collection_info(self):
         return self.client.get_collection(collection_name=self.collection_name)
 
     def search_collection(self, query_text, limit=5):
+        query_vector = list(self.model.embed(query_text))[0].tolist()
         return self.client.query_points(
             collection_name=self.collection_name,
-            query=Document(text=query_text, model=MODEL_NAME),
+            query=query_vector,
             limit=limit
         )
 
 loader = CollectionLoader()
 print(loader.search_collection(query_text="RAG"))
-
-
-
