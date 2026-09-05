@@ -1,4 +1,6 @@
 from rag_dataclasses import *
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 
 class TextChunker:
     """Splits article text into chunks suitable for reranking/RAG."""
@@ -9,21 +11,19 @@ class TextChunker:
 
     def split(self, paper: Paper, text: str) -> list[Chunk]:
         """Split one article into overlapping chunks."""
-        chunks = []
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.overlap,
+            length_function=len,
+            separators=["\n\n", "\n", " ", ""]
+        )
 
-        start = 0
+        if not text:
+            return []
 
-        while start < len(text):
-            end = start + self.chunk_size
+        text_chunks = text_splitter.split_text(text)
 
-            chunks.append(
-                Chunk(
-                    paper_id=paper.arxiv_id,
-                    title=paper.title,
-                    text=text[start:end],
-                )
-            )
-
-            start += self.chunk_size - self.overlap
-
-        return chunks
+        return [Chunk(paper_id=paper.arxiv_id,
+                      title=paper.title,
+                      text=text)
+                for text in text_chunks]

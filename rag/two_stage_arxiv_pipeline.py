@@ -19,6 +19,7 @@ from TextsReranker import FullTextReranker
 from Pipeline import RAGPipeline
 from pathlib import Path
 from rag_dataclasses import *
+from utils.paths import *
 from qdrant_client import QdrantClient
 from fastembed import TextEmbedding
 import certifi
@@ -30,6 +31,7 @@ from arxiv import Client
 COLLECTION_NAME = "arXiv_abstracts"
 QDRANT_URL = "http://localhost:6333"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+PDF_PATH = ROOT / "temp_pdf_papers"
 
 if __name__ == "__main__":
     client_arxiv = Client()
@@ -37,14 +39,17 @@ if __name__ == "__main__":
     embded_model = TextEmbedding(MODEL_NAME)
 
     retriever = ArxivRetriever(qdrant_client=client_qdrant, embedding_model=embded_model, collection_name=COLLECTION_NAME)
-    results = retriever.search(query="Graph decomposition", top_k=5)
+    results = retriever.search(query="Aerospace", top_k=5)
 
     downloader = FullTextDownloader()
-    downloader.download(arxiv_client=client_arxiv, paper=results[0])
-    downloader.download(arxiv_client=client_arxiv, paper=results[1])
-    downloader.download(arxiv_client=client_arxiv, paper=results[2])
-    # parser = PDFParser(...)
-    # chunker = TextChunker(chunk_size=800, overlap=100)
+    p = downloader.download(arxiv_client=client_arxiv, paper=results[0], output_dir=PDF_PATH)
+    parser = PDFParser()
+    p_text = parser.parse(p)
+
+    chunker = TextChunker(chunk_size=800, overlap=100)
+    c = chunker.split(paper=results[0], text=p_text)
+
+
     # reranker = FullTextReranker(...)
     #
     # pipeline = RAGPipeline(

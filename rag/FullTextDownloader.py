@@ -1,17 +1,15 @@
 from rag_dataclasses import *
 import os
 import shutil
-from utils.paths import *
+from pathlib import Path
 import arxiv
 from urllib.request import urlretrieve
 
 
-OUTPUT_PATH = ROOT / "temp_pdf_papers"
-
 class FullTextDownloader:
     """Downloads PDFs for the papers selected by the first-stage retriever."""
 
-    def download(self, arxiv_client: arxiv.Client, paper: Paper, output_dir: Path= OUTPUT_PATH) -> Path:
+    def download(self, arxiv_client: arxiv.Client, paper: Paper, output_dir: Path) -> Path:
         """Download one paper and return the local PDF path."""
         paper_id = paper.arxiv_id
         search = arxiv.Search(id_list=[paper_id])
