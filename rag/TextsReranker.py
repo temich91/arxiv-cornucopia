@@ -2,12 +2,7 @@ from rag_dataclasses import *
 
 
 class FullTextReranker:
-    """Ranks article chunks by relevance to the query.
-
-    Unlike the first-stage vector search, this class does NOT need Qdrant.
-    It receives a relatively small candidate set and performs a more
-    expensive query-document relevance calculation.
-    """
+    """Ranks article chunks by relevance to the query."""
 
     def __init__(self, reranker_model):
         self.model = reranker_model
@@ -18,9 +13,8 @@ class FullTextReranker:
         chunks: list[Chunk],
         top_n: int = 10,
     ) -> list[Chunk]:
-        pairs = [(query, chunk.text) for chunk in chunks]
-
-        scores = self.model.predict(pairs)
+        documents = [chunk.text for chunk in chunks]
+        scores = self.model.rerank(query, documents)
 
         scored_chunks = []
 
