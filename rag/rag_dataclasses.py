@@ -5,7 +5,7 @@ class Paper:
     arxiv_id: str
     title: str
     abstract: str
-    pdf_url: str
+    update_date: str
 
 @dataclass
 class Chunk:

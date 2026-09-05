@@ -21,6 +21,7 @@ class ArxivRetriever:
             collection_name=self.collection_name,
             query=query_vector,
             limit=top_k,
+            with_payload=True
         ).points
 
         papers = []
@@ -33,7 +34,7 @@ class ArxivRetriever:
                     arxiv_id=payload["id"],
                     title=payload["title"],
                     abstract=payload["abstract"],
-                    pdf_url=payload["pdf_url"],
+                    update_date=payload["update_date"],
                 )
             )
 

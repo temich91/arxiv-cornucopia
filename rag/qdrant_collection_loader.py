@@ -37,7 +37,7 @@ class CollectionLoader:
     def fill_collection(self, batch_size=BATCH_SIZE):
         for batch in tqdm(self.metadata.iter_slices(n_rows=batch_size), desc="Batches processed"):
             texts = batch["abstract"].to_list()
-            payloads = batch.select(["id", "title", "update_date"]).to_dicts()
+            payloads = batch.select(["id", "title", "abstract", "update_date"]).to_dicts()
             embeddings = self.model.embed(texts)
             ids = [uuid7().hex for _ in range(len(texts))]
 

@@ -7,7 +7,7 @@ from pathlib import Path
 from rag_dataclasses import *
 
 
-class ResearchPipeline:
+class RAGPipeline:
     """Coordinates the complete two-stage retrieval pipeline."""
 
     def __init__(
