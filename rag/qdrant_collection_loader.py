@@ -5,6 +5,7 @@ import polars as pl
 from tqdm import tqdm
 from fastembed import TextEmbedding
 from uuid6 import uuid7
+import time
 
 COLLECTION_NAME = "arXiv_abstracts"
 QDRANT_URL = "http://localhost:6333"
@@ -23,7 +24,7 @@ class CollectionLoader:
         self.fill_collection()
 
     def _get_metadata(self, path):
-        return pl.read_parquet(path)
+        return pl.read_parquet(path, n_rows=500)
 
     def create_collection(self):
         if not self.client.collection_exists(self.collection_name):
@@ -61,4 +62,6 @@ class CollectionLoader:
         )
 
 loader = CollectionLoader()
-print(loader.search_collection(query_text="RAG"))
+
+for res in loader.search_collection(query_text="ecology").points:
+    print(res.score, res.payload["title"])
