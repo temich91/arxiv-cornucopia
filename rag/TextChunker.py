@@ -25,5 +25,7 @@ class TextChunker:
 
         return [Chunk(paper_id=paper.arxiv_id,
                       title=paper.title,
-                      text=text)
+                      text=text,
+                      update_date=paper.update_date,
+                      pdf_url=paper.pdf_url)
                 for text in text_chunks]

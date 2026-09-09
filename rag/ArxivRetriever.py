@@ -1,4 +1,5 @@
 from rag_dataclasses import *
+import arxiv
 
 
 class ArxivRetriever:
@@ -9,7 +10,11 @@ class ArxivRetriever:
         self.model = embedding_model
         self.collection_name = collection_name
 
-    def search(self, query: str, top_k: int = 20) -> list[Paper]:
+    def _get_pdf_url(self, arxiv_client: arxiv.Client, arxiv_id: str) -> str:
+        search = arxiv.Search(id_list=[arxiv_id])
+        return next(arxiv_client.results(search)).pdf_url
+
+    def search(self, arxiv_client: arxiv.Client, query: str, top_k: int = 20) -> list[Paper]:
         """Return the top-K papers from Qdrant.
 
         The actual conversion from Qdrant payload -> Paper depends on
@@ -35,6 +40,7 @@ class ArxivRetriever:
                     title=payload["title"],
                     abstract=payload["abstract"],
                     update_date=payload["update_date"],
+                    pdf_url=self._get_pdf_url(arxiv_client, payload["id"])
                 )
             )
 

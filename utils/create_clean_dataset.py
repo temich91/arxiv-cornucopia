@@ -4,7 +4,7 @@ from paths import *
 import polars as pl
 
 RAW_JSON_PATH = DATA_PATH / "arxiv-metadata-oai-snapshot.json"
-COLS_TO_USE = ["id", "title", "abstract", "update_date"]
+COLS_TO_USE = ["id", "title", "abstract", "update_date", "categories"]
 
 (
     pl.scan_ndjson(RAW_JSON_PATH)

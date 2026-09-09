@@ -5,7 +5,6 @@ import polars as pl
 from tqdm import tqdm
 from fastembed import TextEmbedding
 from uuid6 import uuid7
-import time
 
 COLLECTION_NAME = "arXiv_abstracts"
 QDRANT_URL = "http://localhost:6333"

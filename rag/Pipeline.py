@@ -5,7 +5,9 @@ from TextChunker import TextChunker
 from TextsReranker import FullTextReranker
 from pathlib import Path
 from arxiv import Client
-from rag_dataclasses import *
+from dataclasses import asdict
+import json
+import os
 
 
 class RAGPipeline:
@@ -19,6 +21,7 @@ class RAGPipeline:
         parser: PDFParser,
         chunker: TextChunker,
         reranker: FullTextReranker,
+        pdf_path: Path
     ):
         self.arxiv_client = arxiv_client
         self.retriever = retriever
@@ -26,28 +29,33 @@ class RAGPipeline:
         self.parser = parser
         self.chunker = chunker
         self.reranker = reranker
+        self.pdf_path = pdf_path
+        if not os.path.exists(self.pdf_path):
+            os.mkdir(self.pdf_path)
 
     def search(
         self,
         query: str,
         candidates_cnt: int = 10,
         top_chunks_cnt: int = 5,
-        pdf_dir: Path = Path("data/temp_pdf_papers"),
-    ) -> list[Chunk]:
-        papers = self.retriever.search(query, top_k=candidates_cnt)
+    ) -> list[str]:
+        papers = self.retriever.search(self.arxiv_client, query, top_k=candidates_cnt)
 
         texts = []
 
         for i in range(len(papers)):
-            paper = self.downloader.download(arxiv_client=self.arxiv_client, paper=papers[i], output_dir=pdf_dir)
+            paper = self.downloader.download(paper=papers[i], output_dir=self.pdf_path)
             paper_text = self.parser.parse(paper)
             texts.append(paper_text)
-        all_chunks = [chunk for i in range(len(papers)) for chunk in self.chunker.split(paper=papers[i], text=texts[i])]
 
-        self.downloader.clean(pdf_dir)
+        all_chunks = [chunk for i in range(len(papers))
+                      for chunk in self.chunker.split(paper=papers[i], text=texts[i])]
 
-        return self.reranker.rerank(
+        self.downloader.clean(self.pdf_path)
+
+        ranked_chunks = self.reranker.rerank(
             query=query,
             chunks=all_chunks,
             top_n=top_chunks_cnt,
         )
+        return [json.dumps(asdict(chunk)) for chunk in ranked_chunks]

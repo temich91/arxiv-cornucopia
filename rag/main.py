@@ -19,13 +19,13 @@ COLLECTION_NAME = "arXiv_abstracts"
 QDRANT_URL = "http://localhost:6333"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 CROSS_ENCODER_NAME = "Xenova/ms-marco-MiniLM-L-6-v2"
-PDF_PATH = ROOT / "temp_pdf_papers"
+PDF_PATH = DATA_PATH / "temp_pdf_papers"
 
 if __name__ == "__main__":
     client_arxiv = Client()
     client_qdrant = QdrantClient(url=QDRANT_URL, prefer_grpc=True)
-    embded_model = TextEmbedding(MODEL_NAME)
-    retriever = ArxivRetriever(qdrant_client=client_qdrant, embedding_model=embded_model, collection_name=COLLECTION_NAME)
+    embdedding_model = TextEmbedding(MODEL_NAME)
+    retriever = ArxivRetriever(qdrant_client=client_qdrant, embedding_model=embdedding_model, collection_name=COLLECTION_NAME)
     downloader = FullTextDownloader()
     parser = PDFParser()
     chunker = TextChunker(chunk_size=800, overlap=100)
@@ -40,16 +40,16 @@ if __name__ == "__main__":
         downloader=downloader,
         parser=parser,
         chunker=chunker,
-        reranker=reranker
+        reranker=reranker,
+        pdf_path=PDF_PATH
     )
 
     papers = pipeline.search(
         query=query,
         candidates_cnt=10,
         top_chunks_cnt=5,
-        pdf_dir=PDF_PATH
     )
 
     for chunk in papers:
-        print(chunk.score, chunk.title)
-        print(chunk.text[:500])
+        print(chunk)
+        break
