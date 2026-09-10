@@ -1,4 +1,4 @@
-from rag_dataclasses import *
+from rag.rag_dataclasses import *
 import shutil
 from pathlib import Path
 from urllib.request import urlretrieve

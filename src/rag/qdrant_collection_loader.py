@@ -1,6 +1,6 @@
 from qdrant_client import QdrantClient
-from qdrant_client.models import Batch, Distance, VectorParams, PointStruct
-from utils.paths import *
+from qdrant_client.models import Batch, Distance, VectorParams
+from src.utils.paths import *
 import polars as pl
 from tqdm import tqdm
 from fastembed import TextEmbedding

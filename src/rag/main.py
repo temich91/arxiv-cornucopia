@@ -4,7 +4,7 @@ from PDFParser import PDFParser
 from TextChunker import TextChunker
 from TextsReranker import FullTextReranker
 from Pipeline import RAGPipeline
-from utils.paths import *
+from src.utils.paths import *
 from qdrant_client import QdrantClient
 from fastembed import TextEmbedding
 import certifi

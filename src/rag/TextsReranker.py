@@ -1,4 +1,4 @@
-from rag_dataclasses import *
+from rag.rag_dataclasses import *
 
 
 class FullTextReranker:
