@@ -5,13 +5,9 @@ import polars as pl
 from tqdm import tqdm
 from fastembed import TextEmbedding
 from uuid6 import uuid7
+from utils.constants import *
+from utils.config import *
 
-COLLECTION_NAME = "arXiv_abstracts"
-QDRANT_URL = "http://localhost:6333"
-
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-BATCH_SIZE = 256
-METADATA_PATH = DATA_PATH / "arxiv_metadata.parquet"
 
 class CollectionLoader:
     def __init__(self, collection_name=COLLECTION_NAME, metadata_path=METADATA_PATH):
@@ -23,7 +19,7 @@ class CollectionLoader:
         self.fill_collection()
 
     def _get_metadata(self, path):
-        return pl.read_parquet(path, n_rows=500)
+        return pl.read_parquet(path, n_rows=METADATA_ROWS_TO_LOAD)
 
     def create_collection(self):
         if not self.client.collection_exists(self.collection_name):
@@ -61,6 +57,3 @@ class CollectionLoader:
         )
 
 loader = CollectionLoader()
-
-for res in loader.search_collection(query_text="ecology").points:
-    print(res.score, res.payload["title"])

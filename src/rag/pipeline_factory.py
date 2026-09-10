@@ -8,14 +8,8 @@ from arxiv import Client
 from qdrant_client import QdrantClient
 from fastembed import TextEmbedding
 from fastembed.rerank.cross_encoder import TextCrossEncoder
-from utils.paths import *
-
-COLLECTION_NAME = "arXiv_abstracts"
-QDRANT_URL = "http://localhost:6333"
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-CROSS_ENCODER_NAME = "Xenova/ms-marco-MiniLM-L-6-v2"
-PDF_PATH = DATA_PATH / "temp_pdf_papers"
-
+from utils.constants import *
+from utils.config import *
 
 def create_pipeline():
     client_arxiv = Client()
@@ -26,7 +20,7 @@ def create_pipeline():
                                collection_name=COLLECTION_NAME)
     downloader = FullTextDownloader()
     parser = PDFParser()
-    chunker = TextChunker(chunk_size=800, overlap=100)
+    chunker = TextChunker(chunk_size=CHUNK_SIZE, overlap=OVERLAP)
     rerank_model = TextCrossEncoder(CROSS_ENCODER_NAME)
     reranker = FullTextReranker(reranker_model=rerank_model)
 

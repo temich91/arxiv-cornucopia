@@ -5,6 +5,7 @@
 
 import kaggle
 from paths import DATA_PATH
+from utils.config import KAGGLE_DATASET
 
 kaggle.api.authenticate()
-kaggle.api.dataset_download_files("Cornell-University/arxiv", path=DATA_PATH, unzip=True)
+kaggle.api.dataset_download_files(KAGGLE_DATASET, path=DATA_PATH, unzip=True)

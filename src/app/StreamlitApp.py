@@ -1,8 +1,6 @@
 from app.BackendClient import BackendClient
 import streamlit as st
-
-MIN_RESULTS = 1
-MAX_RESULTS = 20
+from utils.constants import *
 
 class StreamlitApp:
     """Streamlit web interface class."""
