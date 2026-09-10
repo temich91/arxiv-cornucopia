@@ -27,4 +27,15 @@ class FullTextReranker:
             reverse=True,
         )
 
-        return scored_chunks[:top_n]
+        best_articles_cnt = 0
+        best_articles = set()
+        best_articles_chunks = []
+        i = 0
+        while best_articles_cnt < top_n:
+            if scored_chunks[i].paper_id not in best_articles:
+                best_articles.add(scored_chunks[i].paper_id)
+                best_articles_cnt += 1
+                best_articles_chunks.append(scored_chunks[i])
+            i += 1
+
+        return best_articles_chunks
