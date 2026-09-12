@@ -1,5 +1,7 @@
+import time
 from rag.rag_dataclasses import *
 import arxiv
+from utils.constants import PDF_DOWNLOAD_TIMEOUT
 
 
 class ArxivRetriever:
@@ -43,5 +45,6 @@ class ArxivRetriever:
                     pdf_url=self._get_pdf_url(arxiv_client, payload["id"])
                 )
             )
+            time.sleep(PDF_DOWNLOAD_TIMEOUT)
 
         return papers

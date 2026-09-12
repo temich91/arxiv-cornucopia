@@ -8,6 +8,8 @@ from arxiv import Client
 from dataclasses import asdict
 import json
 import os
+import time
+from utils.constants import *
 
 
 class RAGPipeline:
@@ -40,11 +42,12 @@ class RAGPipeline:
         top_chunks_cnt: int = 5,
     ) -> list[str]:
         papers = self.retriever.search(self.arxiv_client, query, top_k=candidates_cnt)
-
+        print(len(papers))
         texts = []
 
         for i in range(len(papers)):
             paper = self.downloader.download(paper=papers[i], output_dir=self.pdf_path)
+            time.sleep(PDF_DOWNLOAD_TIMEOUT)
             paper_text = self.parser.parse(paper)
             texts.append(paper_text)
 
