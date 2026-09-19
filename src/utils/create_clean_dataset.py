@@ -1,7 +1,10 @@
 # Process raw JSON file of articles' metadata to retrieve significant properties
 from paths import *
 import polars as pl
+from utils.paths import ROOT
+import sys
 
+sys.path.append(ROOT)
 COLS_TO_USE = ["id", "title", "abstract", "update_date", "categories"]
 
 (

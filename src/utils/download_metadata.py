@@ -6,6 +6,9 @@
 import kaggle
 from paths import DATA_PATH
 from utils.config import KAGGLE_DATASET
+from utils.paths import ROOT
+import sys
 
+sys.path.append(ROOT)
 kaggle.api.authenticate()
 kaggle.api.dataset_download_files(KAGGLE_DATASET, path=DATA_PATH, unzip=True)

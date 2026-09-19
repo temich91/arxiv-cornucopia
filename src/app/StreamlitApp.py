@@ -48,17 +48,12 @@ class StreamlitApp:
             with st.spinner(
                 "Синхронизация с базой ArXiv и обработка эмбеддингов..."
             ):
-                try:
-                    df_results = self.client.fetch_results(
-                        query,
-                        max_results,
-                    )
-                    st.session_state["search_results"] = df_results
+                df_results = self.client.fetch_results(
+                    query,
+                    max_results,
+                )
+                st.session_state["search_results"] = df_results
 
-                except Exception as e:
-                    st.error(
-                        f"Произошла ошибка при обработке запроса: {e}"
-                    )
 
         self._render_results()
 

@@ -10,10 +10,15 @@ from fastembed import TextEmbedding
 from fastembed.rerank.cross_encoder import TextCrossEncoder
 from utils.constants import *
 from utils.config import *
+import os
 
+host = os.getenv("QDRANT_HOST", "127.0.0.1")
+port = int(os.getenv("QDRANT_PORT", 6333))
+
+client = QdrantClient(host=host, port=port)
 def create_pipeline():
     client_arxiv = Client()
-    client_qdrant = QdrantClient(url=QDRANT_URL, prefer_grpc=True)
+    client_qdrant = QdrantClient(url=host, port=port, prefer_grpc=True)
     embdedding_model = TextEmbedding(MODEL_NAME)
     retriever = ArxivRetriever(qdrant_client=client_qdrant,
                                embedding_model=embdedding_model,

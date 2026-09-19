@@ -42,7 +42,7 @@ class RAGPipeline:
         top_chunks_cnt: int = 5,
     ) -> list[str]:
         papers = self.retriever.search(self.arxiv_client, query, top_k=candidates_cnt)
-        print(len(papers))
+
         texts = []
 
         for i in range(len(papers)):

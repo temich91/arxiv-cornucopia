@@ -11,6 +11,7 @@ class FullTextDownloader:
         """Download one paper and return the local PDF path."""
         paper_id = paper.arxiv_id
         url = paper.pdf_url
+        print(url)
         filename, _ = urlretrieve(url, output_dir / f"{paper_id}.pdf")
         return Path(filename)
 
